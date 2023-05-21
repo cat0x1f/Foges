@@ -2,7 +2,7 @@
 
 ## 安装依赖
 
-`pip install -r requests.txt`
+`pip install -r requirements.txt`
 
 ## 运行
 
