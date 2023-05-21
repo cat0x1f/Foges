@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "header": { "slots": null, "params": null },
+  "db": {
+    "version": 1,
+    "entries": [
+      {
+        "type": "totp",
+        "uuid": "3ae6f1ad-2e65-4ed2-a953-1ec0dff2386d",
+        "name": "Mason",    
+        "issuer": "Deno",
+        "icon": null,
+        "info": {
+          "secret": "4SJHB4GSD43FZBAI7C2HLRJGPQ",
+          "algo": "SHA1",
+          "digits": 6,
+          "period": 30
+        }
+      }
+    ]
+  }
+}
