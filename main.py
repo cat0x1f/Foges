@@ -71,7 +71,7 @@ with st.sidebar:
 
 def show_2fa_table(entries_list):
     table_content = ""
-    table_begin = """<table><tr><td>图标</td><td>网站</td><td>用户名</td><td>验证码</td><td>类型</td><td>加密算法</td><td>数字数</td><td>周期/计数</td><td>密钥</td></tr>"""
+    table_begin = """<style>table{border-collapse:collapse;white-space:nowrap;}td,th{border:1pxsolidblack;padding:5px;}</style><table><tr><td>图标</td><td>网站</td><td>用户名</td><td>验证码</td><td>类型</td><td>加密算法</td><td>数字数</td><td>周期/计数</td><td>密钥</td></tr>"""
     for item in entries_list:
         if item["type"] == "totp":
             type = "TOTP"
