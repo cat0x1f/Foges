@@ -23,52 +23,56 @@ st.markdown(
 
 with st.sidebar:
     with st.form("选择文件"):
-        备份文件 = st.file_uploader("上传你的 Aegis 备份", type="json")
-        是否加密 = st.checkbox("你的 Aegis 备份是否加密", value=False)
-        是否显示密钥 = st.checkbox("是否要显示密钥", value=False)
+        uploaded_file = st.file_uploader("上传你的 Aegis 备份", type="json")
+        is_encrypted_checkbox = st.checkbox("你的 Aegis 备份是否加密", value=False)
+        is_show_secret_checkbox = st.checkbox("是否要显示密钥", value=False)
 
-        每次刷新时间 = st.number_input(
+        period_time = st.number_input(
             "几秒后刷新一次页面", step=1, value=10, min_value=1, max_value=60
         )
-        确认按钮 = st.form_submit_button("确认按钮")
+        st.form_submit_button("确认按钮")
 
-        if 备份文件 == None:
+        if uploaded_file == None:
             st.warning("未选择文件")
 
     with st.form("输入密码"):
-        输入密码框 = st.text_input("在这里输入加密密码", type="password", disabled=not 是否加密)
-        确认密码 = st.form_submit_button(
-            "确认密码", disabled=是否加密 == False or (是否加密 == True and 输入密码框 == None)
+        password_text_input = st.text_input(
+            "在这里输入加密密码", type="password", disabled=not is_encrypted_checkbox
         )
-    st_autorefresh(interval=每次刷新时间 * 1000)
+        st.form_submit_button(
+            "确认密码",
+            disabled=is_encrypted_checkbox == False
+            or (is_encrypted_checkbox == True and password_text_input == None),
+        )
+    st_autorefresh(interval=period_time * 1000)
 
-    # def 是否加密():
-    #     if 备份文件:
-    #         return True if json.loads(备份文件.read().decode("utf-8"))["headers"]["slots"] else False
-
-    def 解密项目():
-        if 是否加密 == True:
+    def decrypt_items():
+        if is_encrypted_checkbox == True:
             try:
-                解密后项目列表 = json.loads(
-                    decrypt.decrypt(备份文件.read().decode("utf-8"), 输入密码框)
+                entries_list = json.loads(
+                    decrypt.decrypt(
+                        uploaded_file.read().decode("utf-8"), password_text_input
+                    )
                 )["entries"]
-                # st.write(解密后项目列表)
-                return 解密后项目列表
+                # st.write(entries_list)
+                return entries_list
             except:
-                st.error("有错误")
-        if 是否加密 == False:
+                st.error("出错了！这看起来是你的错误，试试修改解密选项。")
+        if is_encrypted_checkbox == False:
             try:
-                解密后项目列表 = json.loads(备份文件.read().decode("utf-8"))["db"]["entries"]
-                # st.write(解密后项目列表)
-                return 解密后项目列表
+                entries_list = json.loads(uploaded_file.read().decode("utf-8"))["db"][
+                    "entries"
+                ]
+                # st.write(entries_list)
+                return entries_list
             except:
-                st.error("有错误")
+                st.error("出错了！这看起来是你的错误，试试修改解密选项。")
 
 
-def 显示两步验证(解密后项目列表):
+def show_2fa_table(entries_list):
     table_content = ""
-    table_begin = """<table><tr><td>图标</td><td>网站</td><td>用户名</td><td>验证码</td><td>类型</td><td>加密算法</td><td>数字数</td><td>周期或计数</td><td>密钥</td></tr>"""
-    for item in 解密后项目列表:
+    table_begin = """<table><tr><td>图标</td><td>网站</td><td>用户名</td><td>验证码</td><td>类型</td><td>加密算法</td><td>数字数</td><td>周期/计数</td><td>密钥</td></tr>"""
+    for item in entries_list:
         if item["type"] == "totp":
             type = "TOTP"
             number = totp.totp(
@@ -77,7 +81,7 @@ def 显示两步验证(解密后项目列表):
                 digits=item["info"]["digits"],
                 digest=item["info"]["algo"],
             )
-            周期或计数 = item["info"]["period"]
+            counter_or_period_info = item["info"]["period"]
 
         elif item["type"] == "hotp":
             type = "HOTP"
@@ -88,7 +92,7 @@ def 显示两步验证(解密后项目列表):
                 digest=item["info"]["algo"],
             )
 
-            周期或计数 = item["info"]["counter"]
+            counter_or_period_info = item["info"]["counter"]
 
         else:
             number = "不支持的类型"
@@ -99,20 +103,20 @@ def 显示两步验证(解密后项目列表):
             with open("assets/default_icon.svg") as f:
                 base64_icon = f.read()
 
-        密钥 = item["info"]["secret"] if 是否显示密钥 else 114514
+        secret = item["info"]["secret"] if is_show_secret_checkbox else 114514
 
         table_content = (
             table_content
-            + f"""<tr><td><img src="data:image/svg+xml;base64,{base64_icon}" width="100%" height="100%"></td><td>{item["issuer"]}</td><td>{item["name"]}</td><td><b>{number}</b></td><td>{type}</td><td>{item["info"]["algo"]}</td><td>{item["info"]["digits"]}</td><td>{周期或计数}</td><td>{密钥}</td></tr>"""
+            + f"""<tr><td><img src="data:image/svg+xml;base64,{base64_icon}" width="100%" height="100%"></td><td>{item["issuer"]}</td><td>{item["name"]}</td><td><b>{number}</b></td><td>{type}</td><td>{item["info"]["algo"]}</td><td>{item["info"]["digits"]}</td><td>{counter_or_period_info}</td><td>{secret}</td></tr>"""
         )
 
     table = table_begin + table_content
     st.markdown(table, unsafe_allow_html=True)
 
 
-if not 备份文件:
-    with open("assets/aegis_plain.json") as 备份文件:
-        解密后项目列表 = json.load(备份文件)["db"]["entries"]
-        显示两步验证(解密后项目列表)
+if not uploaded_file:
+    with open("assets/aegis_plain.json") as uploaded_file:
+        entries_list = json.load(uploaded_file)["db"]["entries"]
+        show_2fa_table(entries_list)
 else:
-    显示两步验证(解密项目())
+    show_2fa_table(decrypt_items())
