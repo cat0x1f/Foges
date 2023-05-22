@@ -12,14 +12,19 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.header("猫猫的在线 Aegis 备份查看器")
+st.header("🐾 Foges，猫猫的在线 Aegis 备份查看器 🐾")
+st.markdown(
+    unsafe_allow_html=True,
+    body="""
 
-st.markdown("#### *HOTP 没有测试*")
+*目前只支持标准 TOTP，HOTP 和其它格式不保证完全支援。*
+""",
+)
 
 with st.sidebar:
     with st.form("选择文件"):
         备份文件 = st.file_uploader("上传你的 Aegis 备份", type="json")
-        是否加密 = st.checkbox("你的 Aegis 备份是否加密", value=True)
+        是否加密 = st.checkbox("你的 Aegis 备份是否加密", value=False)
         是否显示密钥 = st.checkbox("是否要显示密钥", value=False)
 
         每次刷新时间 = st.number_input(
@@ -36,6 +41,10 @@ with st.sidebar:
             "确认密码", disabled=是否加密 == False or (是否加密 == True and 输入密码框 == None)
         )
     st_autorefresh(interval=每次刷新时间 * 1000)
+
+    # def 是否加密():
+    #     if 备份文件:
+    #         return True if json.loads(备份文件.read().decode("utf-8"))["headers"]["slots"] else False
 
     def 解密项目():
         if 是否加密 == True:
