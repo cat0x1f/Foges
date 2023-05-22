@@ -108,7 +108,7 @@ def show_2fa_table(entries_list):
 
         table_content = (
             table_content
-            + f"""<tr><td><img src="data:image/svg+xml;base64,{base64_icon}" width="100%" height="100%"></td><td>{item["issuer"]}</td><td>{item["name"]}</td><td><b>{number}</b></td><td>{type}</td><td>{item["info"]["algo"]}</td><td>{item["info"]["digits"]}</td><td>{counter_or_period_info}</td><td>{secret}</td></tr>"""
+            + f"""<tr><td><img src="data:image/svg+xml;base64,{base64_icon}"></td><td>{item["issuer"]}</td><td>{item["name"]}</td><td><b>{number}</b></td><td>{type}</td><td>{item["info"]["algo"]}</td><td>{item["info"]["digits"]}</td><td>{counter_or_period_info}</td><td>{secret}</td></tr>"""
         )
 
     table = table_begin + table_content
