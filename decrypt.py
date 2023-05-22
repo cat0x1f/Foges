@@ -20,9 +20,6 @@ def die(msg, code=1):
 
 
 def decrypt(data, password):
-    # parse the Aegis vault file
-    # with io.open(datafile, "r") as f:
-    #     data = json.load(f)
     data = json.loads(data)
     # ask the user for a password
     password = password.encode("utf-8")

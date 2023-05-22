@@ -58,7 +58,7 @@ with st.sidebar:
                 return entries_list
             except:
                 st.error("出错了！这看起来是你的错误，试试修改解密选项。")
-        if is_encrypted_checkbox == False:
+        elif is_encrypted_checkbox == False:
             try:
                 entries_list = json.loads(uploaded_file.read().decode("utf-8"))["db"][
                     "entries"
@@ -95,6 +95,7 @@ def show_2fa_table(entries_list):
             counter_or_period_info = item["info"]["counter"]
 
         else:
+            type = item["type"] if item["type"] else "错误的类型"
             number = "不支持的类型"
 
         if item["icon"] != None:
@@ -115,7 +116,7 @@ def show_2fa_table(entries_list):
 
 
 if not uploaded_file:
-    with open("assets/aegis_plain.json") as uploaded_file:
+    with open("assets/sample.json") as uploaded_file:
         entries_list = json.load(uploaded_file)["db"]["entries"]
         show_2fa_table(entries_list)
 else:
