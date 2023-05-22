@@ -1,10 +1,9 @@
-import streamlit as st
-import totp
-import decrypt
 import json
-from datetime import datetime
+import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 
+import decrypt
+import totp
 
 st.set_page_config(
     page_title="猫猫的在线 Aegis 备份查看器",
@@ -85,21 +84,26 @@ def 显示两步验证(解密后项目列表):
         else:
             number = "不支持的类型"
 
-        icon = (
-            item["icon"]
-            if item["icon"] != None
-            else "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiPg0KICAgPGNpcmNsZSBjeD0iNTEyIiBjeT0iNTEyIiByPSI1MTIiIHN0eWxlPSJmaWxsOiM3MzczNzMiLz4NCiAgIDxwYXRoIGQ9Ik01MDEuNCA3MjMuM0gzMDAuN1Y1MjIuNmgyMDAuN3YyMDAuN3ptMjIxLjkgMEg1MjIuNlY1MjIuNmgyMDAuN3YyMDAuN3pNNTAxLjQgNTAxLjRIMzAwLjdWMzAwLjdoMjAwLjd2MjAwLjd6bTIyMS45IDBINTIyLjZWMzAwLjdoMjAwLjd2MjAwLjd6IiBzdHlsZT0iZmlsbDojZmZmIi8+DQo8L3N2Zz4NCg=="
-        )
+        if item["icon"] != None:
+            base64_icon = item["icon"]
+        else:
+            with open("assets/default_icon.svg") as f:
+                base64_icon = f.read()
 
         密钥 = item["info"]["secret"] if 是否显示密钥 else 114514
 
         table_content = (
             table_content
-            + f"""<tr><td><img src="data:image/svg+xml;base64,{icon}" width="100%" height="100%"></td><td>{item["issuer"]}</td><td>{item["name"]}</td><td><b>{number}</b></td><td>{type}</td><td>{item["info"]["algo"]}</td><td>{item["info"]["digits"]}</td><td>{周期或计数}</td><td>{密钥}</td></tr>"""
+            + f"""<tr><td><img src="data:image/svg+xml;base64,{base64_icon}" width="100%" height="100%"></td><td>{item["issuer"]}</td><td>{item["name"]}</td><td><b>{number}</b></td><td>{type}</td><td>{item["info"]["algo"]}</td><td>{item["info"]["digits"]}</td><td>{周期或计数}</td><td>{密钥}</td></tr>"""
         )
 
     table = table_begin + table_content
     st.markdown(table, unsafe_allow_html=True)
 
 
-显示两步验证(解密项目())
+if not 备份文件:
+    with open("assets/aegis_plain.json") as 备份文件:
+        解密后项目列表 = json.load(备份文件)["db"]["entries"]
+        显示两步验证(解密后项目列表)
+else:
+    显示两步验证(解密项目())
